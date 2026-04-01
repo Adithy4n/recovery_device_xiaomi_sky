@@ -60,7 +60,7 @@ subsystem mem_buf_vm
 /dev/smd_cxm_qmi          0640   radio      radio
 /dev/smd5                 0660   system     system
 /dev/smd6                 0660   system     system
-/dev/smd7                 0660   bluetooth  net_bt
+/dev/smd7                 0660   bluetooth  bluetooth
 /dev/ccid_bridge          0660   system     system
 /dev/ipa                  0660   radio      radio
 /dev/wwan_ioctl           0660   radio      radio
@@ -84,6 +84,7 @@ subsystem mem_buf_vm
 /dev/smd2                 0660   bluetooth  bluetooth
 /dev/smd3                 0660   bluetooth  bluetooth
 /dev/btpower              0660   bluetooth  system
+/dev/btfmslim             0660   bluetooth  system
 
 #permissions for pta
 /dev/pta                  0660   system     system
@@ -177,6 +178,7 @@ subsystem mem_buf_vm
 
 #QDSS
 /dev/byte-cntr            0660   system    oem_2902
+/dev/byte-cntr1            0660   system    oem_2902
 /dev/mhi_qdss             0660   system    oem_2902
 /sys/class/qdss_bridge/mhi_qdss  mode      0660     system   oem_2902
 
@@ -207,7 +209,6 @@ subsystem mem_buf_vm
 /dev/msm_vidc_dec_sec     0660   system     audio
 /dev/msm_vidc_enc         0660   system     audio
 /dev/msm_rotator          0660   system     system
-/dev/hw_random            0600   root       root
 /dev/sdsprpc-smd          0660   system     system
 
 #permissions for audio
@@ -329,9 +330,8 @@ subsystem mem_buf_vm
 
 #nfc permissions
 /dev/nfc-nci              0660    nfc         nfc
+/dev/nq-nci               0660    nfc         nfc
 /dev/assd                 0660    nfc         nfc
-/dev/pn553                0660    nfc         nfc
-/dev/p73                  0660    secure_element secure_element
 
 # UIO devices
 /dev/uio0                 0660   system     system
@@ -354,8 +354,6 @@ subsystem mem_buf_vm
 /dev/qbt*                 0660   system     system
 /sys/class/fts/touch_aoi aoi_set 0660 root system
 /sys/class/fts/touch_aoi power_set 0660 root system
-
-/dev/goodix_fp            0766   system     root
 
 #ImproveTouch device
 /dev/hbtp_input           0660   system     system
