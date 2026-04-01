@@ -65,8 +65,8 @@ on property:twrp.modules.loaded=true
     write /tmp/flashlight/max_brightness "1"
     symlink /sys/devices/virtual/camera/factory_test_flash/rear_flash /tmp/flashlight/brightness
 
-on boot && on property:twrp.modules.loaded=true
-    # Haptics Implementation
-    write /sys/class/leds/vibrator/trigger "transient"
-    start vendor.qti.vibrator
+#on boot && on property:twrp.modules.loaded=true
+#    # Haptics Implementation
+#    write /sys/class/leds/vibrator/trigger "transient"
+#    start vendor.qti.vibrator
 
