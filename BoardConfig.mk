@@ -173,7 +173,7 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libxml2.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko"
+TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko camera.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
 #TW_SUPPORT_INPUT_AIDL_HAPTICS := true
