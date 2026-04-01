@@ -13,18 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
 # Only the below variable(s) need to be changed!
-#
 
 # Define hardware platform
-PRODUCT_PLATFORM := taro
+PRODUCT_PLATFORM := parrot
 
-#
-#
-#
 # The below variables will be generated automatically
-#
 #
 # Release name (automatically taken from this file's suffix)
 PRODUCT_RELEASE_NAME := $(lastword $(subst /, ,$(lastword $(subst _, ,$(firstword $(subst ., ,$(MAKEFILE_LIST)))))))
