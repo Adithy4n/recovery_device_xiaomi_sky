@@ -48,9 +48,8 @@ TARGET_USES_REMOTEPROC := true
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_MKBOOTIMG_ARGS := --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
-BOARD_KERNEL_IMAGE_NAME := kernel
 BOARD_RAMDISK_USE_LZ4 := true
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
+TARGET_PREBUILT_KERNEL := /dev/null
 
 # Partition Info
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
@@ -199,24 +198,3 @@ RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/strace
 #RECOVERY_BINARY_SOURCE_FILES += $(TARGET_RECOVERY_ROOT_OUT)/sbin/twrpdec
 
 #
-# For local builds only
-#
-# TWRP zip installer
-ifneq ($(wildcard bootable/recovery/installer/.),)
-    USE_RECOVERY_INSTALLER := true
-    RECOVERY_INSTALLER_PATH := bootable/recovery/installer
-endif
-
-# Custom TWRP Versioning
-ifneq ($(wildcard device/common/version-info/.),)
-    # Uncomment the below line to use custom device version
-    include device/common/version-info/custom_twrp_version.mk
-
-    # version prefix is optional - the default value is "LOCAL" if nothing is set in device tree
-    CUSTOM_TWRP_VERSION_PREFIX := CPTB
-
-    ifeq ($(CUSTOM_TWRP_VERSION),)
-        CUSTOM_TWRP_VERSION := $(shell date +%Y%m%d)-01
-    endif
-endif
-
