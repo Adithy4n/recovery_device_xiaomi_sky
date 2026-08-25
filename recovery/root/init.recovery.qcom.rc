@@ -32,6 +32,8 @@ on early-init
 
 on init
     write /sys/class/backlight/panel0-backlight/brightness 200
+    mkdir /tmp/misc 0755 root root
+    symlink /data/misc/keystore /tmp/misc/keystore
 
 on fs
     wait /dev/block/platform/soc/${ro.boot.bootdevice}
