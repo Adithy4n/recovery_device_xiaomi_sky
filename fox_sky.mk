@@ -66,4 +66,6 @@ OF_DEFAULT_TIMEZONE=IST-5:30
 # add dmctl
 OF_USE_DMCTL := 1
 
-#
+# use AIDL boot hal instead of HIDL
+OF_USE_AIDL_BOOT_CONTROL := 1
+ 
