@@ -54,14 +54,14 @@ OF_ENABLE_ALL_PARTITION_TOOLS := 1
 # automatically wipe /metadata after formatting /data
 OF_WIPE_METADATA_AFTER_DATAFORMAT := 1
 
-# use lz4 compression 
+# use lz4 compression
 OF_USE_LZ4_COMPRESSION := 1
 
 # ofox maintainer
 OF_MAINTAINER=ADITHYAN
 
 # Timezone
-OF_DEFAULT_TIMEZONE=IST-5:30 
+OF_DEFAULT_TIMEZONE=IST-5:30
 
 # add dmctl
 OF_USE_DMCTL := 1
