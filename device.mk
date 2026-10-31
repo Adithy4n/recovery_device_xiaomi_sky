@@ -48,7 +48,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 # A/B updater updatable partitions list. Keep in sync with the partition list
 # with "_a" and "_b" variants in the device. Note that the vendor can add more
 # more partitions to this list for the bootloader and radio.
-AB_OTA_PARTITIONS ?= boot vendor_boot recovery vendor vendor_dlkm system system_dlkm odm dtbo vbmeta vbmeta_system
+AB_OTA_PARTITIONS ?= boot vendor_boot recovery product vendor vendor_dlkm system system_ext system_dlkm odm dtbo vbmeta vbmeta_system
 
 # A/B related packages
 PRODUCT_PACKAGES += update_engine \
@@ -84,10 +84,8 @@ TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 
 #Fix kernel image not found error
 PRODUCT_OTA_ENFORCE_VINTF_KERNEL_REQUIREMENTS := false
-# tell update_engine to not change dynamic partition table during updates
-# needed since our qti_dynamic_partitions does not include
-# vendor and odm and we also dont want to AB update them
-TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
+
+#TARGET_ENFORCE_AB_OTA_PARTITION_LIST := true
 
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
