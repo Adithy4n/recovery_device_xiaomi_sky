@@ -1,0 +1,31 @@
+#!/system/bin/sh
+# rw - mount the logical partitions of the current slot as rw under /super
+
+BASE=/super
+PARTS="system system_ext system_dlkm product vendor vendor_dlkm odm odm_dlkm"
+
+SLOT="$(getprop ro.boot.slot_suffix)"
+if [ -z "$SLOT" ]; then
+    echo "error: slot suffix not found"
+    exit 1
+fi
+echo "current slot: $SLOT"
+
+for p in $PARTS; do
+    dev="/dev/block/mapper/${p}${SLOT}"
+    mp="$BASE/$p"
+
+    if [ ! -e "$dev" ]; then
+        echo "$p: skipped, $dev does not exist"
+        continue
+    fi
+
+    mkdir -p "$mp"
+    blockdev --setrw "$dev" 2>/dev/null
+
+    if err="$(mount -o rw "$dev" "$mp" 2>&1)"; then
+        echo "$p: mounted rw at $mp"
+    else
+        echo "$p: mount failed: $err"
+    fi
+done
