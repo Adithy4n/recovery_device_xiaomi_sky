@@ -1,0 +1,64 @@
+#!/system/bin/sh
+# rw - mount the logical partitions of the current slot as rw under $BASE
+# usage: rw            mount all as rw
+#        rw unmount    unmount them again
+
+BASE=/super
+PARTS="system system_ext system_dlkm product vendor vendor_dlkm odm odm_dlkm"
+
+case "$1" in
+    "")               ACTION=mount ;;
+    unmount|umount)   ACTION=unmount ;;
+    *)
+        echo "usage: rw [unmount]"
+        exit 1
+        ;;
+esac
+
+SLOT="$(getprop ro.boot.slot_suffix)"
+if [ -z "$SLOT" ]; then
+    echo "error: slot suffix not found"
+    exit 1
+fi
+echo "current slot: $SLOT"
+
+for p in $PARTS; do
+    dev="/dev/block/mapper/${p}${SLOT}"
+    mp="$BASE/$p"
+
+    if [ "$ACTION" = "unmount" ]; then
+        if ! grep -q " $mp " /proc/mounts; then
+            echo "$p: not mounted at $mp, skipping"
+        elif err="$(umount "$mp" 2>&1)"; then
+            echo "$p: unmounted $mp"
+        else
+            echo "$p: unmount failed: $err"
+        fi
+        continue
+    fi
+
+    if [ ! -e "$dev" ]; then
+        echo "$p: skipped, $dev does not exist"
+        continue
+    fi
+
+    real="$(readlink -f "$dev")"
+    cur="$(grep -m1 -e "^$real " -e "^$dev " /proc/mounts | cut -d' ' -f2)"
+
+    mkdir -p "$mp"
+    blockdev --setrw "$dev" 2>/dev/null
+
+    if [ -n "$cur" ]; then
+        # already mounted by recovery: remount it rw and expose it under $BASE
+        if err="$(mount -o remount,rw "$cur" 2>&1)"; then
+            grep -q " $mp " /proc/mounts || mount -o bind "$cur" "$mp"
+            echo "$p: was mounted at $cur, remounted rw, available at $mp"
+        else
+            echo "$p: remount failed: $err"
+        fi
+    elif err="$(mount -o rw "$dev" "$mp" 2>&1)"; then
+        echo "$p: mounted rw at $mp"
+    else
+        echo "$p: mount failed: $err"
+    fi
+done
