@@ -34,10 +34,10 @@ OF_ENABLE_LPTOOLS := 1
 OF_NO_TREBLE_COMPATIBILITY_CHECK := 1
 
 # flashlight
-OF_FL_PATH1=/tmp/flashlight
+OF_FL_PATH1 := /tmp/flashlight
 
 # ensure that sdcard is unmount before reboot
-OF_UNMOUNT_SDCARDS_BEFORE_REBOOT=1
+OF_UNMOUNT_SDCARDS_BEFORE_REBOOT := 1
 
 # ensure that /sdcard is bind-unmounted before f2fs data repair or format
 OF_UNBIND_SDCARD_F2FS := 1
@@ -58,10 +58,10 @@ OF_WIPE_METADATA_AFTER_DATAFORMAT := 1
 OF_USE_LZ4_COMPRESSION := 1
 
 # ofox maintainer
-OF_MAINTAINER=ADITHYAN
+OF_MAINTAINER := ADITHYAN
 
 # Timezone
-OF_DEFAULT_TIMEZONE=IST-5:30
+OF_DEFAULT_TIMEZONE := IST-5:30
 
 # add dmctl
 OF_USE_DMCTL := 1
