@@ -68,4 +68,12 @@ OF_USE_DMCTL := 1
 
 # use AIDL boot hal instead of HIDL
 OF_USE_AIDL_BOOT_CONTROL := 1
- 
+
+# avoid MTP issues after data format
+OF_BIND_MOUNT_SDCARD_ON_FORMAT := 1
+
+# force casefolding props to true
+OF_FORCE_CASEFOLDING := 1
+
+# block operations after flashing a ROM
+OF_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
