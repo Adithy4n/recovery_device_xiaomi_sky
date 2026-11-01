@@ -1,0 +1,12 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+// WLAN MAC generator
+cc_binary {
+    name: "aera-sky-wlan-mac",
+    srcs: ["aera_sky_wlan_mac.c"],
+    recovery: true,
+    stl: "none",
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
