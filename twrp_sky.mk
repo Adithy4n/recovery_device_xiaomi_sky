@@ -46,5 +46,5 @@ DEVICE_PATH := device/$(PRODUCT_BRAND)/$(PRODUCT_DEVICE)
 $(call inherit-product, $(DEVICE_PATH)/device.mk)
 
 # Fox settings
-$(call inherit-product-if-exists, $(DEVICE_PATH)/fox_$(PRODUCT_RELEASE_NAME).mk)
+$(call inherit-product-if-exists, $(DEVICE_PATH)/aera_$(PRODUCT_RELEASE_NAME).mk)
 
