@@ -1,5 +1,5 @@
 #!/bin/bash
-# FOX_LOCAL_CALLBACK_SCRIPT dispatcher.
+# AERA_LOCAL_CALLBACK_SCRIPT dispatcher.
 # Runs every other *.sh in this folder, alphabetically, each one independently:
 # a failing or missing-input worker is logged and skipped, never stops the rest.
 # Always exits 0 so a worker problem can't abort the build; check the summary.
