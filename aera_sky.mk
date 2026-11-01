@@ -70,3 +70,5 @@ AERA_USE_DMCTL := 1
 # use AIDL boot hal instead of HIDL
 AERA_USE_AIDL_BOOT_CONTROL := 1
 
+# add support for wlan
+AERA_ENABLE_WLAN := 1
