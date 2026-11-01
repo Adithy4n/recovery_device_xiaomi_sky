@@ -78,3 +78,6 @@ AERA_FORCE_CASEFOLDING := 1
 
 # block operations after flashing a ROM
 AERA_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
+
+# add support for wlan
+AERA_ENABLE_WLAN := 1

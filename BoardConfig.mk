@@ -169,7 +169,9 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
 
-AERA_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko camera.ko leds-qpnp-vibrator-ldo.ko"
+AERA_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko camera.ko leds-qpnp-vibrator-ldo.ko cnss_prealloc.ko cnss_utils.ko cnss_nl.ko cnss_plat_ipc_qmi_svc.ko wlan_firmware_service.ko icnss2.ko cnss2.ko rfkill.ko cfg80211.ko qca_cld3_adrastea.ko"
+# Placeholder so the loader still publishes post.decrypt.modules=true
+AERA_POST_DECRYPT_MODULES := "aera_post_decrypt_stage_only.ko"
 AERA_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
 #AERA_SUPPORT_INPUT_AIDL_HAPTICS := true

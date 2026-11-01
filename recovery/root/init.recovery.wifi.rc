@@ -1,0 +1,30 @@
+# WLAN comes up as soon as the initial module pass is done (before decryption)
+on property:twrp.modules.loaded=true
+    start aera-wlan-early
+
+# Retry only; the helper exits if wlan0 exists or WPSS was already requested
+on property:post.decrypt.modules=true
+    start aera-wlan-early
+
+on property:wifi.driver.ready=true
+    write /dev/kmsg "[wlan] readying wpa_supplicant"
+    mkdir /tmp/recovery 0777 root root
+    mkdir /tmp/recovery/sockets 0777 root root
+    start wpa_supplicant
+
+on property:wifi.driver.ready=false
+    stop wpa_supplicant
+
+service wpa_supplicant /system/bin/wpa_supplicant -Dnl80211 -iwlan0 -dd -O/tmp/recovery/sockets -c/vendor/etc/wifi/wpa_supplicant.conf
+    disabled
+    seclabel u:r:recovery:s0
+
+# Idempotent one-shot helper; keep it off the UI / crypto startup path
+service aera-wlan-early /system/bin/sh /system/bin/aera_wlan_early.sh
+    class core
+    disabled
+    oneshot
+    user root
+    group root
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
