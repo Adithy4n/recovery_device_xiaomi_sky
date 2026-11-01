@@ -122,3 +122,15 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
 # Enable Fuse Passthrough
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
+# Sky Adreno 613 backend. The kernel module, KGSL firmware, EGL/GLES userspace and
+# Qualcomm allocator/mapper closure are sourced from the AOSPA vendor dump and remain
+# device-local so generic AERA keeps its software fallback.
+PRODUCT_VENDOR_PROPERTIES += \
+    ro.hardware.egl=adreno
+
+# Per-device WLAN MAC, written before WPSS boots (see custom/AERA/wifi/mac)
+PRODUCT_PACKAGES += aera-sky-wlan-mac
+
+ifeq ($(AERA_ENABLE_MOBILE_DATA),1)
+    PRODUCT_PACKAGES += aera-cellular-provider
+endif
