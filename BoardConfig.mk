@@ -138,25 +138,25 @@ DEVICE_RESOLUTION := 1080x2460
 # TWRP specific build flags
 TARGET_RECOVERY_QCOM_RTC_FIX := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-TW_THEME := portrait_hdpi
-TW_BACKUP_EXCLUSIONS := /data/fonts/files
-TW_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
-TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
-TW_DEFAULT_BRIGHTNESS := 550
-TW_MAX_BRIGHTNESS := 2047
-TW_QCOM_ATS_OFFSET := 1666528204500
-TW_EXCLUDE_APEX := true
-TW_EXCLUDE_DEFAULT_USB_INIT := true
-TW_EXTRA_LANGUAGES := true
-TW_FRAMERATE := 90
-TW_INCLUDE_CRYPTO := true
-TW_NO_EXFAT_FUSE := true
-TW_NO_HAPTICS := true
-#TW_NO_SCREEN_BLANK := true
-TW_SCREEN_BLANK_ON_BOOT := true
-TW_INCLUDE_RESETPROP := true
-TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
-TW_OVERRIDE_SYSTEM_PROPS := \
+AERA_THEME := portrait_hdpi
+AERA_BACKUP_EXCLUSIONS := /data/fonts/files
+AERA_CUSTOM_CPU_TEMP_PATH := "/sys/devices/virtual/thermal/thermal_zone34/temp"
+AERA_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
+AERA_DEFAULT_BRIGHTNESS := 550
+AERA_MAX_BRIGHTNESS := 2047
+AERA_QCOM_ATS_OFFSET := 1666528204500
+AERA_EXCLUDE_APEX := true
+AERA_EXCLUDE_DEFAULT_USB_INIT := true
+AERA_EXTRA_LANGUAGES := true
+AERA_FRAMERATE := 90
+AERA_INCLUDE_CRYPTO := true
+AERA_NO_EXFAT_FUSE := true
+AERA_NO_HAPTICS := true
+#AERA_NO_SCREEN_BLANK := true
+AERA_SCREEN_BLANK_ON_BOOT := true
+AERA_INCLUDE_RESETPROP := true
+AERA_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
+AERA_OVERRIDE_SYSTEM_PROPS := \
     "ro.build.date.utc;ro.bootimage.build.date.utc=ro.build.date.utc;ro.odm.build.date.utc=ro.build.date.utc;ro.product.build.date.utc=ro.build.date.utc;ro.system.build.date.utc=ro.build.date.utc;ro.system_ext.build.date.utc=ro.build.date.utc;ro.vendor.build.date.utc=ro.build.date.utc"
 RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hidl.allocator@1.0.so \
@@ -170,21 +170,21 @@ RECOVERY_LIBRARY_SOURCE_FILES += \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@1.0.so \
     $(TARGET_OUT_SYSTEM_EXT_SHARED_LIBRARIES)/vendor.display.config@2.0.so
 
-TW_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko camera.ko leds-qpnp-vibrator-ldo.ko"
-TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
+AERA_LOAD_VENDOR_MODULES := "adsp_loader_dlkm.ko camera.ko leds-qpnp-vibrator-ldo.ko"
+AERA_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 
-#TW_SUPPORT_INPUT_AIDL_HAPTICS := true
-#TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
-#TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "IVibrator/default"
+#AERA_SUPPORT_INPUT_AIDL_HAPTICS := true
+#AERA_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
+#AERA_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "IVibrator/default"
 
 #TARGET_RECOVERY_DEVICE_MODULES += libexpat
 #RECOVERY_LIBRARY_SOURCE_FILES += \
 #     $(TARGET_OUT_SHARED_LIBRARIES)/libexpat.so
 
 # TWRP Debug Flags
-#TWRP_EVENT_LOGGING := true
+#AERA_EVENT_LOGGING := true
 TARGET_USES_LOGD := true
-TWRP_INCLUDE_LOGCAT := true
+AERA_INCLUDE_LOGCAT := true
 TARGET_RECOVERY_DEVICE_MODULES += debuggerd
 RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/debuggerd
 TARGET_RECOVERY_DEVICE_MODULES += strace
