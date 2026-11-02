@@ -17,9 +17,10 @@ export AERA_USE_ZSTD_BINARY=1
 export AERA_ASH_IS_BASH=1
 
 DIV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export AERA_LOCAL_CALLBACK_SCRIPT="$DIV_DIR/custom/scripts.sh"
- 
+export AERA_LOCAL_CALLBACK_SCRIPT="$DIV_DIR/custom/scripts.sh" 
 export ALLOW_MISSING_DEPENDENCIES=true
+
+export AERA_ENABLE_MOBILE_DATA=1
 
 # Debugging Flags
 # export AERA_RESET_SETTINGS=0

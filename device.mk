@@ -129,3 +129,7 @@ PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 # device-local so generic AERA keeps its software fallback.
 PRODUCT_VENDOR_PROPERTIES += \
     ro.hardware.egl=adreno
+
+ifeq ($(AERA_ENABLE_MOBILE_DATA),1)
+    PRODUCT_PACKAGES += aera-cellular-provider
+endif
