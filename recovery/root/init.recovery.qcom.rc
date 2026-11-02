@@ -27,6 +27,8 @@
 
 import /init.recovery.qcom_decrypt.rc
 import /init.recovery.wifi.rc
+import /init.recovery.cellular.rc
+import /init.recovery.services.rc
 
 on early-init
     write /proc/sys/kernel/firmware_config/force_sysfs_fallback 1
@@ -49,6 +51,8 @@ on post-fs
 
 on property:twrp.modules.loaded=true && property:dev.mnt.blk.firmware=*
     # Load ADSP firmware for PMIC
+    start aera-qrtr-ns
+    start aera-pd-mapper
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
@@ -56,6 +60,8 @@ on property:twrp.modules.loaded=true && property:dev.mnt.blk.firmware=*
 
 on property:ro.twrp.fastbootd=1
     # Load ADSP firmware for PMIC
+    start aera-qrtr-ns
+    start aera-pd-mapper
     wait /sys/kernel/boot_adsp/boot
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
