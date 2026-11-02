@@ -1,0 +1,20 @@
+# QRTR name service and pd-mapper 
+service aera-qrtr-ns /vendor/bin/qrtr-ns -f 1
+    class core
+    disabled
+    user root
+    group root
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
+
+service aera-pd-mapper /vendor/bin/pd-mapper
+    class core
+    disabled
+    user system
+    group system
+    seclabel u:r:recovery:s0
+    stdio_to_kmsg
+
+on property:twrp.modules.loaded=true
+    start aera-qrtr-ns
+    start aera-pd-mapper
