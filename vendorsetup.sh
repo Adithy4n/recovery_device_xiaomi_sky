@@ -22,6 +22,9 @@ export ALLOW_MISSING_DEPENDENCIES=true
 
 export AERA_ENABLE_MOBILE_DATA=1
 
+export AERA_SETTINGS_ROOT_DIRECTORY=/virtual_sd/recovery
+export AERA_MISCELLANEOUS_ROOT_DIRECTORY=/virtual_sd/recovery
+
 # Debugging Flags
 # export AERA_RESET_SETTINGS=0
 # export AERA_INSTALLER_DEBUG_MODE=1
