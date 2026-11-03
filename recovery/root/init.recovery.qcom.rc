@@ -45,6 +45,8 @@ on fs
     # Load ADSP firmware for PMIC
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+    symlink /firmware /vendor/firmware_mnt
+    symlink /firmware/image /image    
 
 on post-fs
     start vendor.boot-qti
