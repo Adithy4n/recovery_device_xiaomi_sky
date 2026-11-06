@@ -1,4 +1,8 @@
 on early-init
+    # Make kernel's default firmware path resolve to recovery's ramdisk vendor
+    mkdir /lib 0755 root root
+    symlink /vendor/firmware /lib/firmware
+
     export LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/vendor/lib64/egl:/system/lib64
 
 on post-fs-data
