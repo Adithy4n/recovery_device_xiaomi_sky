@@ -1,0 +1,11 @@
+# Record the whole boot log into RAM from the moment logd is up, so the UI start-up
+# lines (engine initialized / AeraGpu / Gralloc5 / qdgralloc) can't be rotated out.
+on property:init.svc.logd=running
+    start aera-boot-log
+
+# 4 files x 8 MiB max (~32 MiB of RAM). Files: /tmp/aera_boot_logcat.txt, .1, .2, .3
+service aera-boot-log /system/bin/logcat -b all -v threadtime -f /tmp/aera_boot_logcat.txt -r 8192 -n 4
+    disabled
+    user root
+    group root log
+    seclabel u:r:recovery:s0
