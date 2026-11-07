@@ -2,6 +2,8 @@ on early-init
     # Make kernel's default firmware path resolve to recovery's ramdisk vendor
     mkdir /lib 0755 root root
     symlink /vendor/firmware /lib/firmware
+    setprop vendor.gralloc.enable_snapalloc true
+    setprop vendor.gralloc.enable_logs 1
 
     export LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/vendor/lib64/egl:/system/lib64
 
