@@ -476,15 +476,25 @@ void Session::ConnectData(const std::string &apn,int subscription) {
   Log("MSS running; discovering QMI DMS/NAS/WDS/UIM/WDA/DPM");
   std::vector<Endpoint> endpoints;Endpoint nase;
   bool found=false;
-  for(int attempt=0;attempt<24&&!found;++attempt) {
+  // Diagnostic build: wait up to ~90 s (was 12 s) and log what QRTR shows each ~2 s.
+  const int kDiscoverAttempts=180;
+  for(int attempt=0;attempt<kDiscoverAttempts&&!found;++attempt) {
     CheckCancelled();CheckHelpers();
     try {
       endpoints=Discover(&cancel);
+      if(attempt%4==0) {
+        std::string seen;
+        for(const auto &e:endpoints)seen+=std::to_string(e.service)+"@"+std::to_string(e.node)+" ";
+        Log("discover attempt "+std::to_string(attempt)+": services seen = "+(seen.empty()?"(none)":seen));
+      }
       nase=Find(endpoints,3);
       for(uint32_t service:{1u,2u,11u,26u,47u})Find(endpoints,service,nase.node);
       found=true;
-    }catch(const std::exception &) {
-      CheckCancelled();if(attempt==23)throw;
+      Log("QMI services found after attempt "+std::to_string(attempt));
+    }catch(const std::exception &ex) {
+      CheckCancelled();
+      if(attempt%4==0)Log(std::string("discover attempt ")+std::to_string(attempt)+" failed: "+ex.what());
+      if(attempt==kDiscoverAttempts-1){Log(std::string("discovery gave up: ")+ex.what());throw;}
       Delay(500);
     }
   }
