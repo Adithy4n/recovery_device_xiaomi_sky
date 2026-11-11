@@ -403,7 +403,7 @@ void Session::StartModem() {
   Log("Mounting the active-slot modemfirmware partition read-only");
   PrepareFirmware();CheckCancelled();
   Log("Validated image/modem.mdt; starting RMTFS and TFTP helpers");
-  rmtfs=Spawn("aera-mobile-rmtfs",{"-r","-P","-o","/dev/block/bootdevice/by-name"});
+  rmtfs=Spawn("aera-mobile-rmtfs",{"-v","-r","-P","-o","/dev/block/bootdevice/by-name"});
   tftp=Spawn("aera-mobile-tftp",{"-d"});
   Delay(700);CheckHelpers();
   // Storage/RFS services must be registered before remoteproc boots firmware.
