@@ -13,16 +13,19 @@ int Session::WaitForSim(const Endpoint &endpoint,int subscription) {
   std::map<unsigned,std::string> identities;
   try {
     identities=SimIdentities(uim);
-  }catch(const std::exception &){CheckCancelled();}
+  }catch(const std::exception &e){CheckCancelled();Log(std::string("UIM identity query failed: ")+e.what());}
   unsigned initializing=0,polls=0;
   bool activation_attempted=false;
   const std::string request=std::to_string(getpid())+"-"+std::to_string(++pin_request_sequence);
   while(true) {
     CheckCancelled();CheckHelpers();
     if(++polls%10==0) {
-      try{identities=SimIdentities(uim);}catch(const std::exception &){CheckCancelled();}
+      try{identities=SimIdentities(uim);}catch(const std::exception &e){CheckCancelled();Log(std::string("UIM identity refresh failed: ")+e.what());}
     }
-    const auto cards=ParseSimCards(Field(uim.Call(0x2f,{},5,&cancel),0x10));
+    decltype(uim.Call(0x2f,{},5,&cancel)) card_reply;
+    try{card_reply=uim.Call(0x2f,{},5,&cancel);}
+    catch(const std::exception &e){Log(std::string("UIM get-card-status failed: ")+e.what());throw;}
+    const auto cards=ParseSimCards(Field(card_reply,0x10));
     const int resolved=ResolveSimSubscription(cards,subscription);
     const uint16_t index=resolved==2?cards.secondary:cards.primary;
     const SimCard *selected=nullptr;
@@ -31,6 +34,16 @@ int Session::WaitForSim(const Endpoint &endpoint,int subscription) {
       Json::Value sim;sim["slot"]=card.slot;sim["id"]=identities[card.slot];
       sim["state"]=SimState(card);sim["retries"]=card.retries;sims.append(sim);
       if(card.slot==unsigned((index>>8)+1)&&card.application==unsigned(index&255))selected=&card;
+    }
+    if(polls%4==1) {
+      std::string summary;
+      for(const auto &card:cards.cards)
+        summary+="[slot "+std::to_string(card.slot)+" app "+std::to_string(card.application)+
+                 " state="+SimState(card)+" retries="+std::to_string(card.retries)+"] ";
+      Log("SIM poll "+std::to_string(polls)+": cards="+std::to_string(cards.cards.size())+" "+summary+
+          "primary=0x"+[&]{char b[8];snprintf(b,sizeof b,"%x",cards.primary);return std::string(b);}()+
+          " secondary=0x"+[&]{char b[8];snprintf(b,sizeof b,"%x",cards.secondary);return std::string(b);}()+
+          " resolved="+std::to_string(resolved)+(selected?" selected":" NOT-selected"));
     }
     if(!selected) {
       // UIM may advertise both indexes as 0xffff for several seconds after
@@ -420,7 +433,11 @@ void Session::StartModem() {
 // Verify LTE service before using a WDS session when legacy NAS reports detached.
 void Session::Connect(const std::string &apn,int subscription) {
   Phase("starting","Preparing the mobile modem");
-  ConnectData(apn,subscription);
+  try{ConnectData(apn,subscription);}
+  catch(const std::exception &e){
+    Log(std::string("CONNECT FAILED: ")+e.what()+" | modem state="+Read(modem+"/state"));
+    throw;
+  }
 }
 void Session::StopChild(pid_t &pid) {
   if(pid<=0)return;
@@ -464,10 +481,11 @@ void Session::Stop() {
 void Session::ConnectData(const std::string &apn,int subscription) {
   Log("Starting cellular data session");
   StartModem();
-  bool running=false;
+  bool running=false;std::string last_state;
   for(int i=0;i<80;++i) {
     CheckCancelled();CheckHelpers();
     const auto state=Read(modem+"/state");
+    if(state!=last_state){Log("remoteproc state: "+state+" (poll "+std::to_string(i)+")");last_state=state;}
     if(state=="running") {running=true;break;}
     if(state=="crashed")throw std::runtime_error("MSS crashed during startup");
     Delay(250);
@@ -485,7 +503,9 @@ void Session::ConnectData(const std::string &apn,int subscription) {
       if(attempt%4==0) {
         std::string seen;
         for(const auto &e:endpoints)seen+=std::to_string(e.service)+"@"+std::to_string(e.node)+" ";
-        Log("discover attempt "+std::to_string(attempt)+": services seen = "+(seen.empty()?"(none)":seen));
+        Log("discover attempt "+std::to_string(attempt)+": remoteproc="+Read(modem+"/state")+
+            ", rmtfs pid "+std::to_string(rmtfs)+", tftp pid "+std::to_string(tftp)+
+            ", services seen = "+(seen.empty()?"(none)":seen));
       }
       nase=Find(endpoints,3);
       for(uint32_t service:{1u,2u,11u,26u,47u})Find(endpoints,service,nase.node);
