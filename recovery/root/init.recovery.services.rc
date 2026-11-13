@@ -18,3 +18,32 @@ service aera-pd-mapper /vendor/bin/pd-mapper
 on property:twrp.modules.loaded=true
     start aera-qrtr-ns
     start aera-pd-mapper
+
+# >>> tombstoned (crash dumps)
+service tombstoned /system/bin/tombstoned
+    class core
+    user root
+    group system
+    socket tombstoned_crash seqpacket 0666 system system
+    socket tombstoned_intercept seqpacket 0666 system system
+    socket tombstoned_java_trace seqpacket 0666 system system
+    seclabel u:r:recovery:s0
+    disabled
+
+on post-fs
+    mkdir /data/tombstones 0771 system system
+    mkdir /data/anr 0775 system system
+
+on boot
+    start aera-tombstoned-late
+
+# tombstoned <<<
+
+# Wait for the real /data mount, make sure the dump dir exists, then start tombstoned.
+service aera-tombstoned-late /system/bin/sh -c "until grep -q ' /data ' /proc/mounts; do sleep 1; done; mkdir -p /data/tombstones; chown system:system /data/tombstones; chmod 0771 /data/tombstones; setprop ctl.start tombstoned"
+    class core
+    user root
+    group root
+    seclabel u:r:recovery:s0
+    oneshot
+    stdio_to_kmsg
