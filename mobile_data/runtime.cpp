@@ -113,7 +113,7 @@ bool HasRmtfsUio() {
 std::string Capability() {
   if(ModemPath().empty())return "No supported Qualcomm modem control was found";
   if(!HasRmtfsUio())return "The modem RAM-storage interface is unavailable";
-  for(const auto &helper:{"aera-mobile-rmtfs","aera-mobile-tftp"})
+  for(const auto &helper:{"rmt_storage","aera-mobile-tftp"})
     if(access((std::string(kHelperDirectory)+"/"+helper).c_str(),X_OK))return "Mobile data helpers are not installed";
   Fd transport(socket(42,SOCK_DGRAM|SOCK_CLOEXEC,0));
   if(transport.get()<0)return "The kernel has no QRTR modem transport";

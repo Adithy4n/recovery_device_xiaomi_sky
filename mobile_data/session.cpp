@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 #include "session.hpp"
+#include <cstring>
 
 namespace aera::mobile::sky {
 std::map<unsigned,std::string> Session::SimIdentities(QmiClient &uim) {
@@ -145,6 +146,50 @@ bool Session::Alive(pid_t pid) {
 void Session::CheckHelpers() {
   if(!Alive(rmtfs)||!Alive(tftp))throw std::runtime_error("A modem storage helper stopped unexpectedly");
 }
+// ---- rmt_storage (stock Qualcomm daemon) ---------------------------------
+// /system/bin/rmt_storage is the stock rmt_storage, binary-patched to open
+// /tmp/rmt/<name> instead of /dev/block/bootdevice/by-name/<name>. The modem EFS
+// partitions are copied READ-ONLY into /tmp/rmt; the real partitions are never
+// opened for writing.
+static constexpr const char *kRmtfs="rmt_storage";
+static constexpr const char *kRmtDir="/tmp/rmt";
+static constexpr const char *kRmtParts[]={"modemst1","modemst2","fsc","fsg"};
+static constexpr const char *kRmtRequired[]={"modemst1","modemst2","fsc","fsg"};
+
+static bool CopyPartition(const std::string &from,const std::string &to) {
+  Fd in(open(from.c_str(),O_RDONLY|O_CLOEXEC));
+  if(in.get()<0)return false;
+  Fd out(open(to.c_str(),O_WRONLY|O_CREAT|O_TRUNC|O_CLOEXEC,0666));
+  if(out.get()<0)return false;
+  fchmod(out.get(),0666);
+  std::vector<char> buf(1<<20);
+  while(true) {
+    ssize_t n=read(in.get(),buf.data(),buf.size());
+    if(n<0){if(errno==EINTR)continue;return false;}
+    if(n==0)break;
+    for(ssize_t off=0;off<n;) {
+      ssize_t w=write(out.get(),buf.data()+off,n-off);
+      if(w<0){if(errno==EINTR)continue;return false;}
+      off+=w;
+    }
+  }
+  return true;
+}
+void Session::StageRmt() {
+  mkdir(kRmtDir,0777);chmod(kRmtDir,0777);
+  for(const char *part:kRmtParts) {
+    const bool ok=CopyPartition(std::string("/dev/block/bootdevice/by-name/")+part,
+                                std::string(kRmtDir)+"/"+part);
+    bool required=false;for(const char *r:kRmtRequired)required|=!strcmp(r,part);
+    if(!ok&&required)throw std::runtime_error(std::string("Cannot stage modem partition ")+part);
+    Log(std::string("rmt stage ")+part+(ok?": ok":": skipped"));
+  }
+}
+void Session::UnstageRmt() {
+  for(const char *part:kRmtParts)unlink((std::string(kRmtDir)+"/"+part).c_str());
+  rmdir(kRmtDir);
+}
+
 void Session::PrepareFirmware() {
   // modem${slot} mounted at /firmware for WPSS/audio
   // modemfirmware${slot} (MSS: /image/modem.mdt). Don't replace the first
@@ -403,7 +448,8 @@ void Session::StartModem() {
   Log("Mounting the active-slot modemfirmware partition read-only");
   PrepareFirmware();CheckCancelled();
   Log("Validated image/modem.mdt; starting RMTFS and TFTP helpers");
-  rmtfs=Spawn("aera-mobile-rmtfs",{"-v","-r","-P","-o","/dev/block/bootdevice/by-name"});
+  StageRmt();
+  rmtfs=Spawn(kRmtfs,{});
   tftp=Spawn("aera-mobile-tftp",{"-d"});
   Delay(700);CheckHelpers();
   // Storage/RFS services must be registered before remoteproc boots firmware.
@@ -466,6 +512,7 @@ void Session::Stop() {
     modem_owned=false;
   }
   StopChild(tftp);StopChild(rmtfs);
+  UnstageRmt();
   if(firmware_path_changed) {
     // Never unmount a directory still selected by the global firmware
     // loader: WPSS/ADSP may need that lookup path later in recovery.

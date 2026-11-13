@@ -107,7 +107,7 @@ int Main(int argc,char **argv) {
     Fd transport(socket(42,SOCK_DGRAM|SOCK_CLOEXEC,0));
     const bool qrtr=transport.get()>=0;
     printf("QRTR socket: %s\n",qrtr?"yes":"no");ok&=qrtr;
-    for(const auto *helper:{"aera-mobile-rmtfs","aera-mobile-tftp"}) {
+    for(const auto *helper:{"rmt_storage","aera-mobile-tftp"}) {
       const bool present=access((std::string(kHelperDirectory)+"/"+helper).c_str(),X_OK)==0;
       printf("%s: %s\n",helper,present?"installed":"missing");ok&=present;
     }

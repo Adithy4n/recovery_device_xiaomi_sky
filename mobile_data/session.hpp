@@ -29,6 +29,8 @@ struct Session {
   bool Alive(pid_t pid);
   void CheckHelpers();
   void PrepareFirmware();
+  void StageRmt();
+  void UnstageRmt();
   Endpoint Find(const std::vector<Endpoint> &endpoints,uint32_t service,uint32_t node=UINT32_MAX);
   void Dns();
   void RestoreDns();
