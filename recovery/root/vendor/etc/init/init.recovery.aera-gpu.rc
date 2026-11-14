@@ -1,5 +1,11 @@
 on early-init
-    export LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/egl:/system/lib64
+    # Make kernel default firmware path resolve to recovery ramdisk vendor
+    mkdir /lib 0755 root root
+    symlink /vendor/firmware /lib/firmware
+    setprop vendor.gralloc.enable_snapalloc true
+    setprop vendor.gralloc.enable_logs 1
+
+    export LD_LIBRARY_PATH /vendor/lib64:/vendor/lib64/hw:/vendor/lib64/egl:/system/lib64
 
 on post-fs-data
     mkdir /data/vendor/gpu 0770 root root
