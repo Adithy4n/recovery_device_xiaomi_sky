@@ -91,3 +91,4 @@ service aera-graphics-allocator /vendor/bin/hw/vendor.qti.hardware.display.alloc
     # Do not spin every five seconds if a vendor/runtime mismatch prevents
     # registration. A healthy allocator stays resident after its first start.
     oneshot
+    stdio_to_kmsg
