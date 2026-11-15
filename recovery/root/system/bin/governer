@@ -1,0 +1,126 @@
+#!/system/bin/sh
+# governer - dynamic performance profile for the AERA recovery UI.
+#
+# usage:
+#   governer boot              (called by init: wait for storage, wait <delay> s, apply profile from config)
+#   governer set <profile>     save profile to config.txt and apply now
+#   governer apply [profile]   apply config profile (or the given one) without saving
+#   governer status            show governors, clocks, config
+#
+# profiles: performance | balanced | powersave | auto
+#   auto = performance while charging, powersave below 20% battery, else balanced
+#
+# config: /virtual_sd/recovery/AERA/config.txt  (created on first boot)
+#   profile=balanced
+#   gov=auto          auto = keep the device default governor, or force: walt / schedutil / ...
+#   delay=10          seconds to wait after storage is available before applying
+# (rcu_expedited is not handled here; it is set in the init rc)
+
+CFG_DIR=/virtual_sd/recovery/AERA
+CFG=$CFG_DIR/config.txt
+LOG=/tmp/governer.log
+DEF=/tmp/governer.defaults
+KGSL=/sys/class/kgsl/kgsl-3d0
+CPUD=/sys/devices/system/cpu
+
+rd() { cat "$1" 2>/dev/null; }
+w() { [ -e "$1" ] || return 1
+  if echo "$2" > "$1" 2>/dev/null; then echo "ok   $1 = $2" >> "$LOG"; else echo "FAIL $1 = $2" >> "$LOG"; fi; }
+cfg_get() { [ -f "$CFG" ] && grep -m1 "^$1=" "$CFG" | cut -d= -f2- | tr -d '\r '; }
+
+# ---- remember this boot's stock values once, so balanced/powersave can restore them ----
+capture() {
+  [ -f "$DEF" ] && return
+  : > "$DEF"
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] || continue
+    for f in scaling_governor scaling_max_freq scaling_min_freq; do echo "$c/$f|$(rd $c/$f | head -1)" >> "$DEF"; done
+  done
+  for f in $KGSL/devfreq/governor $KGSL/force_no_nap $KGSL/force_clk_on $KGSL/force_bus_on $KGSL/force_rail_on $KGSL/idle_timer $KGSL/min_clock_mhz; do
+    [ -e "$f" ] && echo "$f|$(rd $f | head -1)" >> "$DEF"
+  done
+  for f in "$CPUD"/cpu[0-9]*/cpuidle/state[0-9]*/disable; do [ -e "$f" ] && echo "$f|$(rd $f | head -1)" >> "$DEF"; done
+}
+restore() {
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] && w "$c/scaling_min_freq" "$(rd $c/cpuinfo_min_freq)"; done
+  while IFS='|' read -r f v; do [ -n "$v" ] && w "$f" "$v"; done < "$DEF"
+}
+
+# ---- governor choice: auto = leave as is, otherwise must be in the available list ----
+set_gov() {
+  want="$1"; case "$want" in ''|auto) return ;; esac
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] || continue
+    case " $(rd $c/scaling_available_governors) " in
+      *" $want "*) w "$c/scaling_governor" "$want" ;;
+      *) echo "skip $c: governor '$want' not available" >> "$LOG" ;;
+    esac
+  done
+}
+
+profile_performance() {
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] || continue
+    m="$(rd $c/cpuinfo_max_freq)"
+    w "$c/scaling_governor" performance
+    w "$c/scaling_max_freq" "$m"; w "$c/scaling_min_freq" "$m"
+  done
+  M="$(rd $KGSL/max_clock_mhz)"; [ -n "$M" ] && w $KGSL/min_clock_mhz "$M"
+  w $KGSL/devfreq/governor performance
+  w $KGSL/force_no_nap 1; w $KGSL/force_clk_on 1; w $KGSL/force_bus_on 1; w $KGSL/force_rail_on 1
+  w $KGSL/idle_timer 10000
+  for s in "$CPUD"/cpu[0-9]*/cpuidle/state[1-9]*; do w "$s/disable" 1; done
+}
+profile_balanced() { restore; set_gov "$(cfg_get gov)"; }
+profile_powersave() {
+  restore; set_gov "$(cfg_get gov)"
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] || continue
+    cap=$(( $(rd $c/cpuinfo_max_freq) * 60 / 100 )); best=""
+    for f in $(rd $c/scaling_available_frequencies); do
+      [ "$f" -le "$cap" ] && { [ -z "$best" ] || [ "$f" -gt "$best" ]; } && best="$f"
+    done
+    w "$c/scaling_max_freq" "${best:-$cap}"
+  done
+}
+
+apply() {
+  p="$1"; [ -n "$p" ] || p="$(cfg_get profile)"; [ -n "$p" ] || p=balanced
+  if [ "$p" = auto ]; then
+    st="$(rd /sys/class/power_supply/battery/status)"; cap="$(rd /sys/class/power_supply/battery/capacity)"
+    case "$st" in Charging|Full) p=performance ;; *) if [ "${cap:-100}" -lt 20 ]; then p=powersave; else p=balanced; fi ;; esac
+  fi
+  : >> "$LOG"; echo "== $(date) apply profile=$p" >> "$LOG"
+  capture
+  case "$p" in
+    performance) profile_performance ;;
+    powersave)   profile_powersave ;;
+    *)           p=balanced; profile_balanced ;;
+  esac
+  echo "applied: $p (log: $LOG)"
+}
+
+status() {
+  echo "config: $CFG"; [ -f "$CFG" ] && sed 's/^/  /' "$CFG"
+  echo "rcu_expedited=$(rd /sys/kernel/rcu_expedited)"
+  echo "cpu available governors: $(rd $CPUD/cpu0/cpufreq/scaling_available_governors)"
+  for c in "$CPUD"/cpu[0-9]*/cpufreq; do [ -d "$c" ] && echo "$(basename "$(dirname "$c")") gov=$(rd $c/scaling_governor) cur=$(rd $c/scaling_cur_freq) min=$(rd $c/scaling_min_freq) max=$(rd $c/scaling_max_freq)"; done
+  echo "gpu available governors: $(rd $KGSL/devfreq/available_governors)"
+  echo "gpu gov=$(rd $KGSL/devfreq/governor) clk=$(rd $KGSL/gpuclk) min_mhz=$(rd $KGSL/min_clock_mhz) no_nap=$(rd $KGSL/force_no_nap) idle_timer=$(rd $KGSL/idle_timer)"
+}
+
+save_cfg() { # key value
+  mkdir -p "$CFG_DIR" 2>/dev/null
+  { [ -f "$CFG" ] && grep -v "^$1=" "$CFG"; echo "$1=$2"; } > /tmp/aera_cfg.new && cat /tmp/aera_cfg.new > "$CFG"
+}
+
+case "$1" in
+  boot)
+    n=0; while [ ! -d "$CFG_DIR" ] && [ ! -d /virtual_sd/recovery ] && [ "$n" -lt 60 ]; do sleep 1; n=$((n+1)); done
+    if [ -d /virtual_sd/recovery ] && [ ! -f "$CFG" ]; then
+      mkdir -p "$CFG_DIR"; printf 'profile=balanced\ngov=auto\ndelay=10\n' > "$CFG"
+    fi
+    d="$(cfg_get delay)"; sleep "${d:-10}"
+    apply ;;
+  set)
+    case "$2" in performance|balanced|powersave|auto) save_cfg profile "$2"; apply "$2" ;; *) echo "profile: performance|balanced|powersave|auto"; exit 1 ;; esac ;;
+  apply) apply "$2" ;;
+  status|"") status ;;
+  *) echo "usage: $0 boot|set <profile>|apply [profile]|status"; exit 1 ;;
+esac
