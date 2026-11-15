@@ -18,3 +18,18 @@ service aera-pd-mapper /vendor/bin/pd-mapper
 on property:twrp.modules.loaded=true
     start aera-qrtr-ns
     start aera-pd-mapper
+
+# Thermal guard: caps the CPU max frequency when the CPU gets hot.
+service aera-thermal-guard /system/bin/aera_thermal_guard
+    class core
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+# Keep thermal monitoring outside the decryption critical path.
+on property:twrp.decrypt.done=true
+    start aera-thermal-guard
+
+on property:ro.crypto.state=unencrypted
+    start aera-thermal-guard
