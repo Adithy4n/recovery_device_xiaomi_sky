@@ -62,3 +62,16 @@ on property:twrp.decrypt.done=true
 
 on property:ro.crypto.state=unencrypted
     start aera-thermal-guard
+
+# Dynamic performance profile ("governer"): reads /virtual_sd/recovery/AERA/config.txt
+# a few seconds after boot and applies performance / balanced / powersave / auto.
+service aera-governer /system/bin/sh /system/bin/governer boot
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+on boot
+    start aera-governer
