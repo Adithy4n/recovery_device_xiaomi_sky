@@ -132,3 +132,6 @@ PRODUCT_PACKAGES += aera-sky-wlan-mac
 ifeq ($(AERA_ENABLE_MOBILE_DATA),1)
     PRODUCT_PACKAGES += aera-cellular-provider
 endif
+
+# Thermal guard: caps CPU max frequency when the CPU gets hot (limits: custom/AERA/thermalguard/ThermalGuard.cpp)
+PRODUCT_PACKAGES += aera_thermal_guard
