@@ -1,4 +1,5 @@
 on early-init
+    write /sys/kernel/rcu_expedited 1
     # Make kernel default firmware path resolve to recovery ramdisk vendor
     mkdir /lib 0755 root root
     symlink /vendor/firmware /lib/firmware
