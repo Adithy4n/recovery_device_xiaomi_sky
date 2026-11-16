@@ -1,4 +1,16 @@
-# QRTR name service and pd-mapper 
+# Fix freeze
+service unmount-vendor /system/bin/sh /system/bin/unmount_vendor.sh
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+on post-fs
+    start unmount-vendor
+
+ # QRTR name service and pd-mapper 
 service aera-qrtr-ns /vendor/bin/qrtr-ns -f 1
     class core
     disabled
