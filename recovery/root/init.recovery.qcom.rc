@@ -42,9 +42,11 @@ on fs
     # Load ADSP firmware for PMIC
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
+    umount /vendor
 
 on post-fs
     start boot-hal-1-2
+    umount /vendor
 
 on property:twrp.modules.loaded=true && property:dev.mnt.blk.firmware=*
     # Load ADSP firmware for PMIC
@@ -52,6 +54,7 @@ on property:twrp.modules.loaded=true && property:dev.mnt.blk.firmware=*
     write /sys/kernel/boot_adsp/boot 1
     wait /sys/class/power_supply/battery
     start health-hal-2-1
+    umount /vendor
 
 on property:ro.twrp.fastbootd=1
     # Load ADSP firmware for PMIC
