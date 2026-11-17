@@ -41,7 +41,7 @@ AERA_FL_PATH1 := /tmp/flashlight
 AERA_UNMOUNT_SDCARDS_BEFORE_REBOOT := 1
 
 # ensure that /sdcard is bind-unmounted before f2fs data repair or format
-AERA_UNBIND_SDCARD_F2FS := 1
+#AERA_UNBIND_SDCARD_F2FS := 1
 
 # number of list options before scrollbar creation
 AERA_OPTIONS_LIST_NUM := 15
@@ -65,19 +65,19 @@ AERA_MAINTAINER := ADITHYAN
 AERA_DEFAULT_TIMEZONE := IST-5:30
 
 # add dmctl
-AERA_USE_DMCTL := 1
+#AERA_USE_DMCTL := 1
 
 # use AIDL boot hal instead of HIDL
 AERA_USE_AIDL_BOOT_CONTROL := 1
 
 # avoid MTP issues after data format
-AERA_BIND_MOUNT_SDCARD_ON_FORMAT := 1
+#AERA_BIND_MOUNT_SDCARD_ON_FORMAT := 1
 
 # force casefolding props to true
-AERA_FORCE_CASEFOLDING := 1
+#AERA_FORCE_CASEFOLDING := 1
 
 # block operations after flashing a ROM
-AERA_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
+#AERA_BLOCK_OPERATIONS_AFTER_ROM_FLASH := 1
 
 # add support for wlan
 AERA_ENABLE_WLAN := 1
