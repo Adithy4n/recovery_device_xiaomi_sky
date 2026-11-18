@@ -14,7 +14,7 @@
 | Dimensions | 168.60mm x 76.28mmx 8.17mm (Weight: 199g) |
 | Display | 1080P IPS LCD (6.79" FHD+ Display \| Refresh rate: 90Hz Touch sampling Rate: 240Hz Peak Brightness: 550 nits) |
 
-## Device Picture (Redmi 12 5G)
+## Device Picture (Redmi 12 5G) 
 
 ![Redmi12_5G](https://github.com/prateekmaru/device_xiaomi_sky/assets/47496067/7dac6202-af1d-4942-944a-a8bd167ecf3e)
 
