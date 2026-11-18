@@ -45,11 +45,25 @@ TARGET_USES_UEFI := true
 TARGET_USES_REMOTEPROC := true
 
 # Kernel/Ramdisk
-BOARD_BOOT_HEADER_VERSION := 4
-BOARD_MKBOOTIMG_ARGS := --header_version $(BOARD_BOOT_HEADER_VERSION)
-BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
+BOARD_BOOT_HEADER_VERSION := 2
+
+BOARD_KERNEL_IMAGE_NAME := Image.gz
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
+BOARD_INCLUDE_RECOVERY_DTBO := true
+BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
+
+BOARD_KERNEL_CMDLINE := disable_dma32=on cpufreq.default_governor=schedutil rcupdate.rcu_expedited=0 printk_ratelimit=0 androidboot.hardware=qcom androidboot.memcg=1 androidboot.usbcontroller=a600000.dwc3 androidboot.init_fatal_reboot_target=recovery
+BOARD_KERNEL_BASE := 0x00000000
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_MKBOOTIMG_ARGS := \
+    --dtb $(DEVICE_PATH)/prebuilt/dtb \
+    --kernel_offset 0x00008000 \
+    --ramdisk_offset 0x01000000 \
+    --tags_offset 0x00000100 \
+    --dtb_offset 0x01f00000 \
+    --header_version $(BOARD_BOOT_HEADER_VERSION)
+
 BOARD_RAMDISK_USE_LZ4 := true
-TARGET_PREBUILT_KERNEL := /dev/null
 
 # Partition Info
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
