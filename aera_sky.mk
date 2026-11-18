@@ -65,7 +65,7 @@ AERA_MAINTAINER := ADITHYAN
 AERA_DEFAULT_TIMEZONE := IST-5:30
 
 # add dmctl
-AERA_USE_DMCTL := 1
+#AERA_USE_DMCTL := 1
 
 # add support for wlan
 AERA_ENABLE_WLAN := 1
