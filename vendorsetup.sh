@@ -16,7 +16,7 @@ export FOX_USE_ZSTD_BINARY=1
 export FOX_ASH_IS_BASH=1
 
 DIV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export FOX_LOCAL_CALLBACK_SCRIPT="$DIV_DIR/custom/scripts.sh"
+export FOX_LOCAL_CALLBACK_SCRIPT="$DIV_DIR/custom/ramdisk_replace.sh‎"
  
 export ALLOW_MISSING_DEPENDENCIES=true
 
