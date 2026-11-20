@@ -60,8 +60,6 @@ BOARD_MKBOOTIMG_ARGS := \
     --dtb_offset 0x01f00000 \
     --header_version $(BOARD_BOOT_HEADER_VERSION)
 
-BOARD_RAMDISK_USE_LZ4 := true
-
 # Partition Info
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 

@@ -55,9 +55,6 @@ AERA_ENABLE_ALL_PARTITION_TOOLS := 1
 # automatically wipe /metadata after formatting /data
 AERA_WIPE_METADATA_AFTER_DATAFORMAT := 1
 
-# use lz4 compression
-AERA_USE_LZ4_COMPRESSION := 1
-
 # ofox maintainer
 AERA_MAINTAINER := ADITHYAN
 
