@@ -66,4 +66,5 @@ OF_DEFAULT_TIMEZONE := IST-5:30
 # add dmctl
 OF_USE_DMCTL := 1
 
-#
+# frp nuker 
+OF_ENABLE_FRP_ADDON := 1
